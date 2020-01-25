@@ -3,20 +3,18 @@ import requests
 from bs4 import BeautifulSoup as BSoup
 
 API_KEY = 'E38B4AEDMKBGQPFM'
-url_Movie = 'https://www.imdb.com/movies-in-theaters/?ref_=nv_mv_inth' # will be used for web scraping
+url_Movie = 'https://www.imdb.com/movies-in-theaters/?ref_=nv_mv_inth'
 url_MostPopular = 'https://www.imdb.com/chart/moviemeter?ref_=nv_mv_mpm'
 url_Mtest = 'https://www.imdb.com/search/title/?genres=thriller&title_type=feature&sort=moviemeter'
 
-#EDITS: instead of making the movies make them a dictionary where the name correlates to its rating -- imbd site has rating between
-# the tags "<strong>"
-
+# Returns list of movie titles in given link
 def title_return(url):
-    # response = requests.get(url_Movie)
     movie_Data = requests.get(url).text
     soup = BSoup(movie_Data, 'lxml')
     movie_Title = soup.find_all('a', attrs = {'href' : re.compile(r'\/title\/tt+\d*\/')})
     return movie_Title
 
+# Parses through list of titles returned from function for better readibility
 def parse_title(url):
     new_title = title_return(url)
     title_list = []
@@ -28,7 +26,8 @@ def parse_title(url):
             else: title_list.append(chunk[1][0:len(chunk[1]) - 3])
     return title_list
 
-def get_top(url, num): # for errors: catch an error if 'num' is too long; it exceeds the number of movies on the site
+# Retrieves the top 'num' number of movies from given url
+def get_top(url, num): 
     new_parse = parse_title(url)
     top_list = []
     if str(new_parse[2]) == 'Get Tickets':
@@ -40,7 +39,8 @@ def get_top(url, num): # for errors: catch an error if 'num' is too long; it exc
             top_list.append(new_parse[i])
     return top_list
 
-def get_topMod(url, num): # for errors: catch an error if 'num' is too long; it exceeds the number of movies on the site
+# Essentially displays top number of moveis in a more readable manner
+def get_topMod(url, num): 
     new_parse = parse_title(url)
     top_list = []
     if str(new_parse[2]) == 'Get Tickets':
@@ -52,6 +52,7 @@ def get_topMod(url, num): # for errors: catch an error if 'num' is too long; it 
             top_list.append(new_parse[i])
     return top_list
 
+# Main
 if __name__ == "__main__":
     print('CLEAR MARKER: TOP 20 POPULAR MOVIES OUT NOW ')
     for i in get_top(url_MostPopular, 10):
